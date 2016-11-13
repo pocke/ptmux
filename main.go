@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"syscall"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -24,7 +26,7 @@ func Main(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Print(conf.ToShell())
+	Exec(conf.ToShell())
 
 	return nil
 }
@@ -50,6 +52,16 @@ func LoadConf(name string) (*Config, error) {
 	}
 
 	return c, nil
+}
+
+func Exec(shell string) error {
+	bin, err := exec.LookPath("sh")
+	if err != nil {
+		return errors.Wrap(err, "cant look up `sh`")
+	}
+	args := []string{"sh", "-c", shell}
+	env := os.Environ()
+	return syscall.Exec(bin, args, env)
 }
 
 type Config struct {
