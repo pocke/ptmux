@@ -39,6 +39,12 @@ windows:
 $ ptmux PROFILE_NAME
 ```
 
+Links
+------
+
+- [tmuxinator の代替ツールを作っている話 - pockestrap](http://pocke.hatenablog.com/entry/2016/11/13/233258)
+
+
 License
 -------
 
