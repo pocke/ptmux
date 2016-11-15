@@ -21,7 +21,11 @@ func main() {
 }
 
 func Main(args []string) error {
-	name := args[1] // TODO: len check
+	if len(args) != 2 {
+		return errors.New("Please specify a profile name")
+	}
+
+	name := args[1]
 	conf, err := LoadConf(name)
 	if err != nil {
 		return err
