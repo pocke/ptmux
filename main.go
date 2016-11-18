@@ -10,6 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/ogier/pflag"
 	"github.com/pkg/errors"
 	"github.com/shibukawa/shell"
 )
@@ -21,18 +22,30 @@ func main() {
 }
 
 func Main(args []string) error {
-	if len(args) != 2 {
-		return errors.New("Please specify a profile name")
+	f := new(Flag)
+	fs := pflag.NewFlagSet("ptmux", pflag.ContinueOnError)
+	fs.BoolVarP(&f.PrintCommands, "print-commands", "p", false, "print shell commands (for debug)")
+	err := fs.Parse(args[1:])
+	if err != nil {
+		return err
 	}
 
-	name := args[1]
+	if len(fs.Args()) != 1 {
+		return errors.New("Please specify a profile name")
+	}
+	name := fs.Arg(0)
 	conf, err := LoadConf(name)
 	if err != nil {
 		return err
 	}
-	Exec(conf.ToShell())
+	sh := conf.ToShell()
 
-	return nil
+	if f.PrintCommands {
+		fmt.Println(sh)
+		return nil
+	}
+
+	return Exec(sh)
 }
 
 func LoadConf(name string) (*Config, error) {
@@ -135,4 +148,8 @@ func (p *Pane) ToShell(isFirst bool) string {
 func Exists(filename string) bool {
 	_, err := os.Stat(filename)
 	return err == nil
+}
+
+type Flag struct {
+	PrintCommands bool
 }
