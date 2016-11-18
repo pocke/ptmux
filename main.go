@@ -18,6 +18,7 @@ import (
 func main() {
 	if err := Main(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
 
@@ -27,6 +28,9 @@ func Main(args []string) error {
 	fs.BoolVarP(&f.PrintCommands, "print-commands", "p", false, "print shell commands (for debug)")
 	err := fs.Parse(args[1:])
 	if err != nil {
+		if err == pflag.ErrHelp {
+			return nil
+		}
 		return err
 	}
 
