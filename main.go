@@ -70,6 +70,7 @@ func Exec(shell string) error {
 
 type Config struct {
 	Root    string   `yaml:"root"`
+	Name    string   `yaml:"name"`
 	Windows []Window `yaml:"windows"`
 }
 
@@ -78,7 +79,12 @@ func (c *Config) ToShell() string {
 	if c.Root != "" {
 		res += fmt.Sprintf("cd %s\n", c.Root)
 	}
-	res += "SESSION_NO=`tmux new-session -dP | cut -d : -f 1`\n\n"
+	sessionName := ""
+	if c.Name != "" {
+		sessionName = fmt.Sprintf("-s %s", c.Name)
+	}
+
+	res += fmt.Sprintf("SESSION_NO=`tmux new-session -dP %s | cut -d : -f 1`\n\n", sessionName)
 
 	for idx, w := range c.Windows {
 		res += w.ToShell(idx == 0)
