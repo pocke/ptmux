@@ -80,7 +80,7 @@ func Exec(shell string) error {
 	if err != nil {
 		return errors.Wrap(err, "cant look up `sh`")
 	}
-	args := []string{"sh", "-c", shell}
+	args := []string{"bash", "-e", "-c", shell}
 	env := os.Environ()
 	return syscall.Exec(bin, args, env)
 }
