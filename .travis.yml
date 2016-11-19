@@ -1,13 +1,29 @@
 language: go
 sudo: false
-addons:
-  apt:
-    packages:
-    - tmux
 go:
   - 1.7
   - tip
+env:
+  - TMUX_VERSION=master
+  - TMUX_VERSION=2.3
+  - TMUX_VERSION=2.2
+  - TMUX_VERSION=2.1
+  - TMUX_VERSION=2.0
+  - TMUX_VERSION=1.8
+  - TMUX_VERSION=1.9a
+
 before_install:
   - go get github.com/mattn/goveralls
+
+before_script:
+  - git clone https://github.com/tmux/tmux.git tmux
+  - cd tmux
+  - git checkout $TMUX_VERSION
+  - sh autogen.sh
+  - ./configure --prefix=$HOME/tmux && make && make install
+  - export PATH=$PATH:$HOME/tmux/bin
+  - cd ..
+  - tmux -V
+
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
