@@ -80,7 +80,7 @@ func Exec(shell string) error {
 	if err != nil {
 		return errors.Wrap(err, "cant look up `sh`")
 	}
-	args := []string{"sh", "-c", shell}
+	args := []string{"bash", "-e", "-c", shell}
 	env := os.Environ()
 	return syscall.Exec(bin, args, env)
 }
@@ -102,7 +102,7 @@ func (c *Config) ToShell() string {
 		sessionName = fmt.Sprintf("-s %s", c.Name)
 	}
 
-	res += fmt.Sprintf("SESSION_NO=`tmux new-session -dP %s | cut -d : -f 1`\n\n", sessionName)
+	res += fmt.Sprintf("SESSION_NO=`tmux new-session -dP %s`\n\n", sessionName)
 
 	for idx, w := range c.Windows {
 		res += w.ToShell(idx == 0)
@@ -123,9 +123,9 @@ type Window struct {
 func (w *Window) ToShell(isFirst bool) string {
 	res := ""
 	if isFirst {
-		res += "WINDOW_NO=$SESSION_NO:1\n"
+		res += "WINDOW_NO=$SESSION_NO\n"
 	} else {
-		res += "WINDOW_NO=`tmux new-window -t $SESSION_NO -a -P | cut -d . -f 1`\n"
+		res += "WINDOW_NO=`tmux new-window -t $SESSION_NO -a -P`\n"
 	}
 
 	for idx, p := range w.Panes {
@@ -144,7 +144,7 @@ type Pane struct {
 func (p *Pane) ToShell(isFirst bool) string {
 	res := ""
 	if isFirst {
-		res += "PANE_NO=$WINDOW_NO.1\n"
+		res += "PANE_NO=$WINDOW_NO\n"
 	} else {
 		res += "PANE_NO=`tmux split-window -t $WINDOW_NO -P`\n"
 	}

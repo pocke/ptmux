@@ -3,7 +3,27 @@ sudo: false
 go:
   - 1.7
   - tip
+env:
+  - TMUX_VERSION=master
+  - TMUX_VERSION=2.3
+  - TMUX_VERSION=2.2
+  - TMUX_VERSION=2.1
+  - TMUX_VERSION=2.0
+
 before_install:
   - go get github.com/mattn/goveralls
+
+before_script:
+  - git clone https://github.com/tmux/tmux.git tmux
+  - cd tmux
+  - git checkout $TMUX_VERSION
+  - sh autogen.sh
+  - ./configure --prefix=$HOME/tmux && make && make install
+  - export PATH=$HOME/tmux/bin:$PATH
+  - cd ..
+  - tmux -V
+  - "echo 'set -g base-index 1' > ~/.tmux.conf"
+
 script:
+  - export PATH=$HOME/tmux/bin:$PATH
   - $HOME/gopath/bin/goveralls -service=travis-ci
