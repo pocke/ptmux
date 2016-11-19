@@ -89,6 +89,7 @@ type Config struct {
 	Root    string   `yaml:"root"`
 	Name    string   `yaml:"name"`
 	Windows []Window `yaml:"windows"`
+	Attach  *bool    `yaml:"attach"`
 }
 
 func (c *Config) ToShell() string {
@@ -107,7 +108,11 @@ func (c *Config) ToShell() string {
 		res += w.ToShell(idx == 0)
 	}
 
-	res += "tmux attach-session -t $SESSION_NO\n"
+	if c.Attach == nil || *c.Attach {
+		res += "tmux attach-session -t $SESSION_NO\n"
+	} else {
+		res += "echo $SESSION_NO\n"
+	}
 	return res
 }
 
