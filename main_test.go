@@ -2,12 +2,15 @@ package main
 
 import (
 	"bytes"
+	"io/ioutil"
+	"os"
 	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 )
 
@@ -141,6 +144,58 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
 }
 
+func TestLoadConf_ForYAMLFile(t *testing.T) {
+	confPath, err := homedir.Expand("~/.config/ptmux/testtest.yaml")
+	if err != nil {
+		t.Error(err)
+	}
+	confContent := `root: ~/hogehoge
+name: poyoyo
+windows:
+  - panes:
+    - command: 'bin/rails s'
+    - command: 'bundle exec sidekiq'
+    - command: 'bin/rails c'
+  - panes:
+    - command: 'gvim'
+    - command: 'bundle exec guard'
+`
+	err = ioutil.WriteFile(confPath, []byte(confContent), 0644)
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.Remove(confPath)
+
+	c, err := LoadConf("testtest")
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected := &Config{
+		Root: "~/hogehoge",
+		Name: "poyoyo",
+		Windows: []Window{
+			{
+				Panes: []Pane{
+					{Command: "bin/rails s"},
+					{Command: "bundle exec sidekiq"},
+					{Command: "bin/rails c"},
+				},
+			},
+			{
+				Panes: []Pane{
+					{Command: "gvim"},
+					{Command: "bundle exec guard"},
+				},
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(c, expected) {
+		t.Errorf("Expected %+v, but got %+v", expected, c)
+	}
+}
+
 func TestConfigToShell_WhenAttachIsNil(t *testing.T) {
 	c := &Config{}
 
@@ -223,5 +278,21 @@ func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []s
 	cmds := strings.Split(strings.TrimSpace(s), "\n")
 	if !reflect.DeepEqual(cmds, expected) {
 		t.Errorf("Should execute %v, but got %v", expected, cmds)
+	}
+}
+
+func PrepareConfigDir() error {
+	path, err := homedir.Expand("~/.config/ptmux")
+	if err != nil {
+		return err
+	}
+
+	return os.MkdirAll(path, 0755)
+}
+
+func init() {
+	err := PrepareConfigDir()
+	if err != nil {
+		panic(err)
 	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"syscall"
@@ -54,25 +53,23 @@ func Main(args []string) error {
 }
 
 func LoadConf(name string) (*Config, error) {
-	confPath, err := homedir.Expand(fmt.Sprintf("~/.config/ptmux/%s.yaml", name))
+	confPath, err := homedir.Expand(fmt.Sprintf("~/.config/ptmux/%s", name))
 	if err != nil {
 		return nil, errors.Wrap(err, "can't expand homedir")
 	}
-	if !Exists(confPath) {
-		return nil, errors.Errorf("%s does not exist", confPath)
+
+	configLoader := &ConfigLoader{
+		Unmarshals: map[string]func([]byte, interface{}) error{
+			"yaml": yaml.Unmarshal,
+			"yml":  yaml.Unmarshal,
+		},
 	}
 
 	c := new(Config)
-	b, err := ioutil.ReadFile(confPath)
+	err = configLoader.Load(confPath, c)
 	if err != nil {
 		return nil, err
 	}
-
-	err = yaml.Unmarshal(b, c)
-	if err != nil {
-		return nil, err
-	}
-
 	return c, nil
 }
 
@@ -159,11 +156,6 @@ func (p *Pane) ToShell(isFirst bool) string {
 	res += fmt.Sprintf("tmux send-keys -t $PANE_NO %s C-m\n", cmd)
 
 	return res
-}
-
-func Exists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
 }
 
 type Flag struct {
