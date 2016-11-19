@@ -15,6 +15,7 @@ addons:
     packages:
       - libevent-dev
       - libncurses-dev
+      - libutempter-dev
 
 before_install:
   - go get github.com/mattn/goveralls
