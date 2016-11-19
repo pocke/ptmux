@@ -9,8 +9,6 @@ env:
   - TMUX_VERSION=2.2
   - TMUX_VERSION=2.1
   - TMUX_VERSION=2.0
-  - TMUX_VERSION=1.8
-  - TMUX_VERSION=1.9a
 
 before_install:
   - go get github.com/mattn/goveralls
