@@ -1,5 +1,5 @@
 language: go
-sudo: required
+sudo: false
 go:
   - 1.7
   - tip
@@ -9,13 +9,6 @@ env:
   - TMUX_VERSION=2.2
   - TMUX_VERSION=2.1
   - TMUX_VERSION=2.0
-
-addons:
-  apt:
-    packages:
-      - libevent-dev
-      - libncurses-dev
-      - libutempter-dev
 
 before_install:
   - go get github.com/mattn/goveralls
@@ -30,6 +23,7 @@ before_script:
   - cd ..
   - tmux start-server
   - tmux -V
+  - "echo 'set -g base-index 1' > ~/.tmux.conf"
 
 script:
   - export PATH=$HOME/tmux/bin:$PATH
