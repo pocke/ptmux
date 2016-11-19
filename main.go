@@ -26,6 +26,7 @@ func Main(args []string) error {
 	f := new(Flag)
 	fs := pflag.NewFlagSet("ptmux", pflag.ContinueOnError)
 	fs.BoolVarP(&f.PrintCommands, "print-commands", "p", false, "print shell commands (for debug)")
+	fs.BoolVarP(&f.Debug, "debug", "d", false, "print debug log")
 	err := fs.Parse(args[1:])
 	if err != nil {
 		if err == pflag.ErrHelp {
@@ -49,7 +50,7 @@ func Main(args []string) error {
 		return nil
 	}
 
-	return Exec(sh)
+	return Exec(sh, f.Debug)
 }
 
 func LoadConf(name string) (*Config, error) {
@@ -75,12 +76,18 @@ func LoadConf(name string) (*Config, error) {
 	return c, nil
 }
 
-func Exec(shell string) error {
+func Exec(shell string, debug bool) error {
 	bin, err := exec.LookPath("sh")
 	if err != nil {
 		return errors.Wrap(err, "cant look up `sh`")
 	}
-	args := []string{"bash", "-e", "-c", shell}
+	var opt string
+	if debug {
+		opt = "-xe"
+	} else {
+		opt = "-e"
+	}
+	args := []string{"bash", opt, "-c", shell}
 	env := os.Environ()
 	return syscall.Exec(bin, args, env)
 }
@@ -161,4 +168,5 @@ func Exists(filename string) bool {
 
 type Flag struct {
 	PrintCommands bool
+	Debug         bool
 }
