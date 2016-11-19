@@ -1,0 +1,14 @@
+hash: 7bf37121c9457da13dfd450bd9ef1c6d7cd57635fa38483c03e29a81ebc7a802
+updated: 2016-11-19T22:30:47.771768547+09:00
+imports:
+- name: github.com/mitchellh/go-homedir
+  version: 756f7b183b7ab78acdbbee5c7f392838ed459dda
+- name: github.com/ogier/pflag
+  version: 32a05c62658bd1d7c7e75cbc8195de5d585fde0f
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/shibukawa/shell
+  version: 4afc7a145a49d7164e9cd597fc3e9d67100ffe8b
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports: []

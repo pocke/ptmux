@@ -1,0 +1,9 @@
+package: github.com/pocke/ptmux
+import:
+- package: github.com/mitchellh/go-homedir
+- package: github.com/ogier/pflag
+  version: ^0.0.1
+- package: github.com/pkg/errors
+  version: ^0.8.0
+- package: github.com/shibukawa/shell
+- package: gopkg.in/yaml.v2
