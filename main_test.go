@@ -114,7 +114,7 @@ func boolPtr(b bool) *bool {
 
 func Execute(t *testing.T, c *Config) (string, error) {
 	sh := c.ToShell()
-	s, err := execCommand(t, "sh", "-c", sh)
+	s, err := execCommand(t, "bash", "-xe", "-c", sh)
 	if err != nil {
 		return "", err
 	}
