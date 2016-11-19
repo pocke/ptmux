@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os/exec"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -32,19 +33,44 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if cnt := strings.Count(strings.TrimSpace(s), "\n"); cnt != 0 {
-		t.Errorf("Window count should be 1, but got %d", cnt+1)
+	if cnt := strings.Count(strings.TrimSpace(s), "\n") + 1; cnt != 1 {
+		t.Errorf("Window count should be 1, but got %d", cnt)
 	}
 
 	time.Sleep(300 * time.Millisecond)
-	s, err = execCommand("tmux", "list-panes", "-t", sessionID+":1", "-F", "#{pane_current_command}")
+	AssertRunningCommand(t, sessionID, "1", []string{"watch"})
+}
 
+func TestExecute_WithManyPanes(t *testing.T) {
+	c := &Config{
+		Windows: []Window{
+			{
+				Panes: []Pane{
+					{Command: "watch ls"},
+					{Command: "nano"},
+					{Command: "yes"},
+				},
+			},
+		},
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	s, err := execCommand("tmux", "list-window", "-t", sessionID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if cmd := strings.TrimSpace(s); cmd != "watch" {
-		t.Errorf("Should execute watch, but got %s", cmd)
+	if cnt := strings.Count(strings.TrimSpace(s), "\n") + 1; cnt != 1 {
+		t.Errorf("Window count should be 1, but got %d", cnt)
 	}
+
+	time.Sleep(500 * time.Millisecond)
+	AssertRunningCommand(t, sessionID, "1", []string{"watch", "nano", "yes"})
 }
 
 func TestConfigToShell_WhenAttachIsNil(t *testing.T) {
@@ -108,4 +134,15 @@ func execCommand(c string, args ...string) (string, error) {
 		return "", errors.Wrap(err, stderr.String())
 	}
 	return string(b), nil
+}
+
+func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []string) {
+	s, err := execCommand("tmux", "list-panes", "-t", sessionID+windowID, "-F", "#{pane_current_command}")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmds := strings.Split(strings.TrimSpace(s), "\n")
+	if !reflect.DeepEqual(cmds, expected) {
+		t.Errorf("Should execute %v, but got %v", expected, cmds)
+	}
 }
