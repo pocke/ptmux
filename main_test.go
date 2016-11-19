@@ -37,7 +37,7 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 		t.Errorf("Window count should be 1, but got %d", cnt)
 	}
 
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch"})
 }
 
@@ -69,7 +69,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 		t.Errorf("Window count should be 1, but got %d", cnt)
 	}
 
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch", "nano", "yes"})
 }
 
