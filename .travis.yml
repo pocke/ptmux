@@ -26,4 +26,5 @@ before_script:
   - tmux -V
 
 script:
+  - export PATH=$PATH:$HOME/tmux/bin
   - $HOME/gopath/bin/goveralls -service=travis-ci
