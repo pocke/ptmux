@@ -21,7 +21,6 @@ before_script:
   - ./configure --prefix=$HOME/tmux && make && make install
   - export PATH=$HOME/tmux/bin:$PATH
   - cd ..
-  - tmux start-server
   - tmux -V
   - "echo 'set -g base-index 1' > ~/.tmux.conf"
 
