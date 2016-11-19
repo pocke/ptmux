@@ -47,7 +47,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 			{
 				Panes: []Pane{
 					{Command: "watch ls"},
-					{Command: "nano"},
+					{Command: "cat"},
 					{Command: "yes"},
 				},
 			},
@@ -70,7 +70,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 	}
 
 	time.Sleep(1 * time.Second)
-	AssertRunningCommand(t, sessionID, "1", []string{"watch", "nano", "yes"})
+	AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
 }
 
 func TestConfigToShell_WhenAttachIsNil(t *testing.T) {
