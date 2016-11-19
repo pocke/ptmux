@@ -1,5 +1,9 @@
 language: go
 sudo: false
+addons:
+  apt:
+    packages:
+      - tmux
 go:
   - 1.7
   - tip
