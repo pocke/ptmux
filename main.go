@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -62,6 +63,7 @@ func LoadConf(name string) (*Config, error) {
 		Unmarshals: map[string]func([]byte, interface{}) error{
 			"yaml": yaml.Unmarshal,
 			"yml":  yaml.Unmarshal,
+			"json": json.Unmarshal,
 		},
 	}
 

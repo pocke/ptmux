@@ -144,12 +144,8 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
 }
 
-func TestLoadConf_ForYAMLFile(t *testing.T) {
-	confPath, err := homedir.Expand("~/.config/ptmux/testtest.yaml")
-	if err != nil {
-		t.Error(err)
-	}
-	confContent := `root: ~/hogehoge
+func TestLoadConf(t *testing.T) {
+	contentYAML := `root: ~/hogehoge
 name: poyoyo
 windows:
   - panes:
@@ -160,16 +156,35 @@ windows:
     - command: 'gvim'
     - command: 'bundle exec guard'
 `
-	err = ioutil.WriteFile(confPath, []byte(confContent), 0644)
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.Remove(confPath)
-
-	c, err := LoadConf("testtest")
-	if err != nil {
-		t.Error(err)
-	}
+	contentJSON := `{
+	"root": "~/hogehoge",
+	"name": "poyoyo",
+	"windows": [
+		{
+			"panes": [
+				{
+					"command": "bin/rails s"
+				},
+				{
+					"command": "bundle exec sidekiq"
+				},
+				{
+					"command": "bin/rails c"
+				}
+			]
+		},
+		{
+			"panes": [
+				{
+					"command": "gvim"
+				},
+				{
+					"command": "bundle exec guard"
+				}
+			]
+		}
+	]
+}`
 
 	expected := &Config{
 		Root: "~/hogehoge",
@@ -191,8 +206,47 @@ windows:
 		},
 	}
 
-	if !reflect.DeepEqual(c, expected) {
-		t.Errorf("Expected %+v, but got %+v", expected, c)
+	testCases := []struct {
+		path    string
+		content string
+	}{
+		{
+			path:    "~/.config/ptmux/testtest.yml",
+			content: contentYAML,
+		},
+		{
+			path:    "~/.config/ptmux/testtest.yaml",
+			content: contentYAML,
+		},
+		{
+			path:    "~/.config/ptmux/testtest.json",
+			content: contentJSON,
+		},
+	}
+
+	for _, c := range testCases {
+		func() {
+			t.Logf("For %s", c.path)
+			path, err := homedir.Expand(c.path)
+			if err != nil {
+				t.Error(err)
+			}
+
+			err = ioutil.WriteFile(path, []byte(c.content), 0644)
+			if err != nil {
+				t.Error(err)
+			}
+			defer os.Remove(path)
+
+			conf, err := LoadConf("testtest")
+			if err != nil {
+				t.Error(err)
+			}
+
+			if !reflect.DeepEqual(conf, expected) {
+				t.Errorf("Expected %+v, but got %+v", expected, conf)
+			}
+		}()
 	}
 }
 
