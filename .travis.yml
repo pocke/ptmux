@@ -21,6 +21,7 @@ before_script:
   - ./configure --prefix=$HOME/tmux && make && make install
   - export PATH=$PATH:$HOME/tmux/bin
   - cd ..
+  - tmux start-server
   - tmux -V
 
 script:
