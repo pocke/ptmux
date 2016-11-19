@@ -3,7 +3,7 @@ sudo: false
 addons:
   apt:
     packages:
-      - tmux
+    - tmux
 go:
   - 1.7
   - tip
