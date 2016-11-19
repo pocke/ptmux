@@ -1,6 +1,9 @@
 ptmux
 ============
 
+[![Coverage Status](https://coveralls.io/repos/github/pocke/ptmux/badge.svg?branch=master)](https://coveralls.io/github/pocke/ptmux?branch=master)
+[![Build Status](https://travis-ci.org/pocke/ptmux.svg?branch=master)](https://travis-ci.org/pocke/ptmux)
+
 
 Installation
 -----------
