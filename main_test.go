@@ -23,13 +23,13 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 		Attach: boolPtr(false),
 	}
 
-	sessionID, err := Execute(c)
+	sessionID, err := Execute(t, c)
 	if err != nil {
 		t.Error(err)
 	}
 	defer CleanSession(sessionID)
 
-	s, err := execCommand("tmux", "list-window", "-t", sessionID)
+	s, err := execCommand(t, "tmux", "list-window", "-t", sessionID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,13 +55,13 @@ func TestExecute_WithManyPanes(t *testing.T) {
 		Attach: boolPtr(false),
 	}
 
-	sessionID, err := Execute(c)
+	sessionID, err := Execute(t, c)
 	if err != nil {
 		t.Error(err)
 	}
 	defer CleanSession(sessionID)
 
-	s, err := execCommand("tmux", "list-window", "-t", sessionID)
+	s, err := execCommand(t, "tmux", "list-window", "-t", sessionID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,9 +112,9 @@ func boolPtr(b bool) *bool {
 	return &b
 }
 
-func Execute(c *Config) (string, error) {
+func Execute(t *testing.T, c *Config) (string, error) {
 	sh := c.ToShell()
-	s, err := execCommand("sh", "-c", sh)
+	s, err := execCommand(t, "sh", "-c", sh)
 	if err != nil {
 		return "", err
 	}
@@ -125,10 +125,11 @@ func CleanSession(sessionID string) error {
 	return exec.Command("tmux", "kill-session", "-t", sessionID).Run()
 }
 
-func execCommand(c string, args ...string) (string, error) {
+func execCommand(t *testing.T, c string, args ...string) (string, error) {
 	stderr := bytes.NewBuffer([]byte{})
 	cmd := exec.Command(c, args...)
 	cmd.Stderr = stderr
+	t.Log(strings.Join(cmd.Args, " "))
 	b, err := cmd.Output()
 	if err != nil {
 		return "", errors.Wrap(err, stderr.String())
@@ -137,7 +138,7 @@ func execCommand(c string, args ...string) (string, error) {
 }
 
 func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []string) {
-	s, err := execCommand("tmux", "list-panes", "-t", sessionID+windowID, "-F", "#{pane_current_command}")
+	s, err := execCommand(t, "tmux", "list-panes", "-t", sessionID+windowID, "-F", "#{pane_current_command}")
 	if err != nil {
 		t.Fatal(err)
 	}
