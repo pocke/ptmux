@@ -29,15 +29,8 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	s, err := execCommand(t, "tmux", "list-window", "-t", sessionID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if cnt := strings.Count(strings.TrimSpace(s), "\n") + 1; cnt != 1 {
-		t.Errorf("Window count should be 1, but got %d", cnt)
-	}
-
 	time.Sleep(1 * time.Second)
+	AssertWindowCount(t, sessionID, 1)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch"})
 }
 
@@ -61,15 +54,8 @@ func TestExecute_WithManyPanes(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	s, err := execCommand(t, "tmux", "list-window", "-t", sessionID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if cnt := strings.Count(strings.TrimSpace(s), "\n") + 1; cnt != 1 {
-		t.Errorf("Window count should be 1, but got %d", cnt)
-	}
-
 	time.Sleep(1 * time.Second)
+	AssertWindowCount(t, sessionID, 1)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
 }
 
@@ -135,6 +121,16 @@ func execCommand(t *testing.T, c string, args ...string) (string, error) {
 		return "", errors.Wrap(err, stderr.String())
 	}
 	return string(b), nil
+}
+
+func AssertWindowCount(t *testing.T, sessionID string, expected int) {
+	s, err := execCommand(t, "tmux", "list-window", "-t", sessionID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cnt := strings.Count(strings.TrimSpace(s), "\n") + 1; cnt != expected {
+		t.Errorf("Window count should be %d, but got %d", expected, cnt)
+	}
 }
 
 func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []string) {
