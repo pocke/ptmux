@@ -26,11 +26,11 @@ before_script:
   - git checkout $TMUX_VERSION
   - sh autogen.sh
   - ./configure --prefix=$HOME/tmux && make && make install
-  - export PATH=$PATH:$HOME/tmux/bin
+  - export PATH=$HOME/tmux/bin:$PATH
   - cd ..
   - tmux start-server
   - tmux -V
 
 script:
-  - export PATH=$PATH:$HOME/tmux/bin
+  - export PATH=$HOME/tmux/bin:$PATH
   - $HOME/gopath/bin/goveralls -service=travis-ci
