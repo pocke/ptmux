@@ -59,6 +59,88 @@ func TestExecute_WithManyPanes(t *testing.T) {
 	AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
 }
 
+func TestExecute_WithManyWindows(t *testing.T) {
+	c := &Config{
+		Windows: []Window{
+			{
+				Panes: []Pane{
+					{Command: "cat"},
+				},
+			},
+			{
+				Panes: []Pane{
+					{Command: "yes"},
+				},
+			},
+			{
+				Panes: []Pane{
+					{Command: "watch ls"},
+				},
+			},
+			{
+				Panes: []Pane{
+					{Command: "sh"},
+				},
+			},
+		},
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(t, c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	time.Sleep(1 * time.Second)
+	AssertWindowCount(t, sessionID, 4)
+	AssertRunningCommand(t, sessionID, "1", []string{"cat"})
+	AssertRunningCommand(t, sessionID, "2", []string{"yes"})
+	AssertRunningCommand(t, sessionID, "3", []string{"watch"})
+	AssertRunningCommand(t, sessionID, "4", []string{"sh"})
+}
+
+func TestExecute_WithSessionName(t *testing.T) {
+	c := &Config{
+		Windows: []Window{
+			{Panes: []Pane{{Command: "yes"}}},
+		},
+		Name:   "testtest",
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(t, c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	AssertWindowCount(t, sessionID, 1)
+	if sessionID != "testtest:" {
+		t.Errorf("session id should be testtest:, but got %s", sessionID)
+	}
+}
+
+func TestExecute_WithSessionRoot(t *testing.T) {
+	c := &Config{
+		Windows: []Window{
+			{Panes: []Pane{{Command: "./sh"}}},
+		},
+		Root:   "/bin/",
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(t, c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	time.Sleep(1 * time.Second)
+	AssertWindowCount(t, sessionID, 1)
+	AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
+}
+
 func TestConfigToShell_WhenAttachIsNil(t *testing.T) {
 	c := &Config{}
 
