@@ -39,7 +39,7 @@ func TestConfigToShell_WhenAttachIsFalse(t *testing.T) {
 	}
 }
 
-// test helper
+// ---------------------------------------------- test helper
 func boolPtr(b bool) *bool {
 	return &b
 }
