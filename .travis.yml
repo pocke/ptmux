@@ -12,6 +12,8 @@ env:
 
 before_install:
   - go get github.com/mattn/goveralls
+  - curl https://glide.sh/get | sh
+  - glide install
 
 before_script:
   - git clone https://github.com/tmux/tmux.git tmux
