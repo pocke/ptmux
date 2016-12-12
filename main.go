@@ -92,10 +92,10 @@ func Exec(shell string, debug bool) error {
 }
 
 type Config struct {
-	Root    string   `yaml:"root"`
-	Name    string   `yaml:"name"`
-	Windows []Window `yaml:"windows"`
-	Attach  *bool    `yaml:"attach"`
+	Root    string
+	Name    string
+	Windows []Window
+	Attach  *bool
 }
 
 func (c *Config) ToShell() string {
@@ -123,7 +123,7 @@ func (c *Config) ToShell() string {
 }
 
 type Window struct {
-	Panes []Pane `yaml:"panes"`
+	Panes []Pane
 }
 
 func (w *Window) ToShell(isFirst bool) string {
@@ -144,7 +144,7 @@ func (w *Window) ToShell(isFirst bool) string {
 }
 
 type Pane struct {
-	Command string `yaml:"command"`
+	Command string
 }
 
 func (p *Pane) ToShell(isFirst bool) string {
