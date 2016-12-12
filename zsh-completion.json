@@ -1,0 +1,25 @@
+{
+  "command": "ptmux",
+  "properties": {
+    "author": "Masataka Kuwabara",
+    "license": "CC0",
+    "help": {
+      "option": [
+        "--help"
+      ],
+      "description": "Print a brief help message."
+    }
+  },
+  "options": {
+    "switch": [
+      {
+        "option": [
+          "-p",
+          "--print-commands"
+        ],
+        "description": "print shell commands (for debug)"
+      }
+    ],
+    "flag": []
+  }
+}

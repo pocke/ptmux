@@ -1,0 +1,23 @@
+#compdef ptmux
+
+# Copyright (c) 2016 Masataka Kuwabara
+# License: CC0
+
+function _ptmux() {
+    local context curcontext=$curcontext state line
+    typeset -A opt_args
+    local ret=1
+
+    _arguments -C \
+      '(--help)--help[Print a brief help message.]' \
+      '(-p --print-commands)'{-p,--print-commands}'[print shell commands (for debug)]' \
+      && ret=0
+
+    local -a names
+    names=( $(ls ~/.config/ptmux/ | sed -E 's/^(.+)\.[^.]+$/\1/') )
+    compadd $names
+
+    return ret
+}
+
+_ptmux "$@"
