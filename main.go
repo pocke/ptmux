@@ -72,7 +72,15 @@ func LoadConf(name string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c, nil
+	if c.InheritFrom == "" {
+		return c, nil
+	}
+
+	base, err := LoadConf(c.InheritFrom)
+	if err != nil {
+		return nil, err
+	}
+	return base.Merge(c), nil
 }
 
 func Exec(shell string, debug bool) error {
@@ -92,10 +100,33 @@ func Exec(shell string, debug bool) error {
 }
 
 type Config struct {
-	Root    string
-	Name    string
-	Windows []Window
-	Attach  *bool
+	Root        string
+	Name        string
+	Windows     []Window
+	Attach      *bool
+	InheritFrom string `json:"inherit_from" yaml:"inherit_from"`
+}
+
+func (c *Config) Merge(right *Config) *Config {
+	merged := new(Config)
+	*merged = *c
+	merged.InheritFrom = ""
+
+	if right.Root != "" {
+		merged.Root = right.Root
+	}
+	if right.Name != "" {
+		merged.Name = right.Name
+	}
+	if right.Attach != nil {
+		merged.Attach = right.Attach
+	}
+	wins := make([]Window, 0, len(c.Windows)+len(right.Windows))
+	wins = append(wins, c.Windows...)
+	wins = append(wins, right.Windows...)
+	merged.Windows = wins
+
+	return merged
 }
 
 func (c *Config) ToShell() string {
