@@ -36,7 +36,7 @@ func Main(args []string) error {
 	}
 
 	if len(fs.Args()) != 1 {
-		return errors.New("Please specify a profile name")
+		return errors.New("Usage: ptmux <profile name>")
 	}
 	name := fs.Arg(0)
 	conf, err := LoadConf(name)
