@@ -5,10 +5,16 @@ ptmux
 [![Build Status](https://travis-ci.org/pocke/ptmux.svg?branch=master)](https://travis-ci.org/pocke/ptmux)
 
 
+Requirements
+---
+
+Go 1.11 or later
+
 Installation
 -----------
 
 ```sh
+export GO111MODULE=on
 go get github.com/pocke/ptmux
 ```
 
