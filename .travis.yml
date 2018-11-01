@@ -18,9 +18,6 @@ addons:
     packages:
       - libevent-dev
 
-before_install:
-  - go get github.com/mattn/goveralls
-
 before_script:
   - git clone https://github.com/tmux/tmux.git tmux
   - cd tmux
@@ -34,4 +31,4 @@ before_script:
 
 script:
   - export PATH=$HOME/tmux/bin:$PATH
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - make test
