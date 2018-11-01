@@ -31,8 +31,8 @@ before_script:
   - ./configure --prefix=$HOME/tmux && make && make install
   - export PATH=$HOME/tmux/bin:$PATH
   - cd ..
-  - tmux -V
   - 'echo "set -g base-index 1\nset-option -g renumber-windows on" > ~/.tmux.conf'
+  - tmux -V
 
 script:
   - export PATH=$HOME/tmux/bin:$PATH
