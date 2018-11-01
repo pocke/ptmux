@@ -33,6 +33,8 @@ Edit `~/.config/ptmux/PROFILE_NAME.yaml`
 ```yaml
 # Example
 root: ~/path/to/your/project/dir
+env:
+  DATABASE_URL: 'mysql2://username:topsecret@localhost/dbname'
 windows:
   - panes:
     - command: 'bin/rails s'

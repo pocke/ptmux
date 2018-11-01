@@ -46,6 +46,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 					{Command: "watch ls"},
 					{Command: "cat"},
 					{Command: "yes"},
+					{Command: "sh"},
 				},
 			},
 		},
@@ -60,7 +61,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 
 	AssertWindowCount(t, sessionID, 1)
 	RetryTest(t, 1*time.Second, 10, func() error {
-		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "sh", "yes", "cat"})
 	})
 }
 

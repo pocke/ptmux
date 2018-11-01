@@ -101,6 +101,7 @@ func Exec(shell string, debug bool) error {
 
 type Config struct {
 	Root        string
+	Env         map[string]string
 	Name        string
 	Windows     []Window
 	Attach      *bool
@@ -121,10 +122,15 @@ func (c *Config) Merge(right *Config) *Config {
 	if right.Attach != nil {
 		merged.Attach = right.Attach
 	}
+
 	wins := make([]Window, 0, len(c.Windows)+len(right.Windows))
 	wins = append(wins, c.Windows...)
 	wins = append(wins, right.Windows...)
 	merged.Windows = wins
+
+	for k, v := range right.Env {
+		merged.Env[k] = v
+	}
 
 	return merged
 }
@@ -141,9 +147,17 @@ func (c *Config) ToShell() string {
 
 	res += fmt.Sprintf("SESSION_NO=`tmux new-session -dP %s`\n\n", sessionName)
 
-	for idx, w := range c.Windows {
-		res += w.ToShell(idx == 0)
+	for k, v := range c.Env {
+		k = shell.Escape(k)
+		v = shell.Escape(v)
+		res += fmt.Sprintf("tmux set-environment -t $SESSION_NO %s %s\n", k, v)
 	}
+
+	for _, w := range c.Windows {
+		res += w.ToShell()
+	}
+
+	res += "tmux kill-window -t ${SESSION_NO}1\n"
 
 	if c.Attach == nil || *c.Attach {
 		res += "tmux attach-session -t $SESSION_NO\n"
@@ -157,13 +171,8 @@ type Window struct {
 	Panes []Pane
 }
 
-func (w *Window) ToShell(isFirst bool) string {
-	res := ""
-	if isFirst {
-		res += "WINDOW_NO=$SESSION_NO\n"
-	} else {
-		res += "WINDOW_NO=`tmux new-window -t $SESSION_NO -a -P`\n"
-	}
+func (w *Window) ToShell() string {
+	res := "WINDOW_NO=`tmux new-window -t $SESSION_NO -a -P`\n"
 
 	for idx, p := range w.Panes {
 		res += p.ToShell(idx == 0)
