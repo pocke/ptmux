@@ -13,6 +13,11 @@ env:
     - TMUX_VERSION=2.1
     - TMUX_VERSION=2.0
 
+addons:
+  apt:
+    packages:
+      - libevent-dev
+
 before_install:
   - go get github.com/mattn/goveralls
 
