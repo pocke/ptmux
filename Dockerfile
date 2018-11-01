@@ -1,4 +1,4 @@
-FROM golang:1.7.3-alpine
+FROM golang:1.11.1-alpine3.7
 MAINTAINER Masataka Kuwabara <kuwabara@pocke.me>
 
 RUN apk --update add tmux bash git && \
