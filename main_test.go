@@ -32,9 +32,10 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
-	AssertRunningCommand(t, sessionID, "1", []string{"watch"})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch"})
+	})
 }
 
 func TestExecute_WithManyPanes(t *testing.T) {
@@ -57,9 +58,10 @@ func TestExecute_WithManyPanes(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
-	AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
+	})
 }
 
 func TestExecute_WithManyWindows(t *testing.T) {
@@ -95,12 +97,20 @@ func TestExecute_WithManyWindows(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 4)
-	AssertRunningCommand(t, sessionID, "1", []string{"cat"})
-	AssertRunningCommand(t, sessionID, "2", []string{"yes"})
-	AssertRunningCommand(t, sessionID, "3", []string{"watch"})
-	AssertRunningCommand(t, sessionID, "4", []string{"sh"})
+
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"cat"})
+	})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "2", []string{"yes"})
+	})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "3", []string{"watch"})
+	})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "4", []string{"sh"})
+	})
 }
 
 func TestExecute_WithSessionName(t *testing.T) {
@@ -139,9 +149,10 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
-	AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
+	})
 }
 
 func TestLoadConf(t *testing.T) {
@@ -324,15 +335,32 @@ func AssertWindowCount(t *testing.T, sessionID string, expected int) {
 	}
 }
 
-func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []string) {
+func RetryTest(t *testing.T, d time.Duration, n int, f func() error) {
+	for i := 0; i < n; i++ {
+		err := f()
+		if err == nil {
+			return
+		}
+
+		if i+1 == n {
+			t.Error(err)
+			return
+		}
+		t.Logf("Retrying... %d", i+1)
+		time.Sleep(d)
+	}
+}
+
+func AssertRunningCommand(t *testing.T, sessionID, windowID string, expected []string) error {
 	s, err := execCommand(t, "tmux", "list-panes", "-t", sessionID+windowID, "-F", "#{pane_current_command}")
 	if err != nil {
 		t.Fatal(err)
 	}
 	cmds := strings.Split(strings.TrimSpace(s), "\n")
 	if !reflect.DeepEqual(cmds, expected) {
-		t.Errorf("Should execute %v, but got %v", expected, cmds)
+		return errors.Errorf("Should execute %v, but got %v", expected, cmds)
 	}
+	return nil
 }
 
 func PrepareConfigDir() error {
