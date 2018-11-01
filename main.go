@@ -10,9 +10,9 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/ogier/pflag"
 	"github.com/pkg/errors"
 	"github.com/shibukawa/shell"
+	"github.com/spf13/pflag"
 )
 
 func main() {
