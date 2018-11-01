@@ -32,7 +32,7 @@ func TestExecute_WithSingleWindow(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch"})
 }
@@ -57,7 +57,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
 	AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
 }
@@ -95,7 +95,7 @@ func TestExecute_WithManyWindows(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 4)
 	AssertRunningCommand(t, sessionID, "1", []string{"cat"})
 	AssertRunningCommand(t, sessionID, "2", []string{"yes"})
@@ -139,7 +139,7 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	}
 	defer CleanSession(sessionID)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	AssertWindowCount(t, sessionID, 1)
 	AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
 }
