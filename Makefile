@@ -9,6 +9,3 @@ test_with_docker:
 
 docker_build:
 	docker build -t ptmux:latest .
-
-dep:
-	glide install
