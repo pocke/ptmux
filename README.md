@@ -8,7 +8,9 @@ ptmux
 Requirements
 ---
 
-Go 1.11 or later
+* Go 1.11 or later
+* `set -g base-index 1` in your `.tmux.conf`
+* tmux 2.0 or newer
 
 Installation
 -----------
