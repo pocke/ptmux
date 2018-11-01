@@ -32,7 +32,7 @@ before_script:
   - export PATH=$HOME/tmux/bin:$PATH
   - cd ..
   - tmux -V
-  - "echo 'set -g base-index 1' > ~/.tmux.conf"
+  - 'echo "set -g base-index 1\nset-option -g renumber-windows on" > ~/.tmux.conf'
 
 script:
   - export PATH=$HOME/tmux/bin:$PATH

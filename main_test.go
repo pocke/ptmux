@@ -156,6 +156,44 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	})
 }
 
+func TestExecute_WithEnv(t *testing.T) {
+	c := &Config{
+		Env: map[string]string{
+			"v1": "foo",
+			"v2": "bar",
+			"v3": "baz",
+			"v4": "foobar",
+			"v5": "aaa",
+		},
+		Windows: []Window{
+			{Panes: []Pane{
+				{Command: "test $v1 = foo && watch ls"},
+				{Command: "test $v2 = bar && cat"},
+			}},
+			{Panes: []Pane{
+				{Command: "test $v3 = baz && yes"},
+				{Command: "test $v4 = foobar && watch ls"},
+				{Command: "test $v5 = aaa && ping localhost"},
+			}},
+		},
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(t, c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	AssertWindowCount(t, sessionID, 2)
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat"})
+	})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "2", []string{"yes", "ping", "watch"})
+	})
+}
+
 func TestLoadConf(t *testing.T) {
 	contentYAML := `root: ~/hogehoge
 name: poyoyo
