@@ -11,7 +11,6 @@ RUN apt-get update && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /go/src/github.com/pocke/ptmux
-RUN echo 'set -g base-index 1' > ~/.tmux.conf
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ENV GO111MODULE=on \

@@ -14,6 +14,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+func TestMain(m *testing.M) {
+	sessionID, err := exec.Command("tmux", "new-session", "-dP").Output()
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		exec.Command("tmux", "kill-session", string(sessionID[:len(sessionID)-1])).Run()
+	}()
+
+	err = exec.Command("tmux", "set", "-g", "base-index", "1").Run()
+	if err != nil {
+		panic(err)
+	}
+	err = exec.Command("tmux", "set-option", "-g", "renumber-windows", "on").Run()
+	if err != nil {
+		panic(err)
+	}
+
+	ret := m.Run()
+	os.Exit(ret)
+}
+
 func TestExecute_WithSingleWindow(t *testing.T) {
 	c := &Config{
 		Windows: []Window{
@@ -46,6 +68,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 					{Command: "watch ls"},
 					{Command: "cat"},
 					{Command: "yes"},
+					{Command: "sh"},
 				},
 			},
 		},
@@ -60,7 +83,7 @@ func TestExecute_WithManyPanes(t *testing.T) {
 
 	AssertWindowCount(t, sessionID, 1)
 	RetryTest(t, 1*time.Second, 10, func() error {
-		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat", "yes"})
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "sh", "yes", "cat"})
 	})
 }
 
@@ -152,6 +175,44 @@ func TestExecute_WithSessionRoot(t *testing.T) {
 	AssertWindowCount(t, sessionID, 1)
 	RetryTest(t, 1*time.Second, 10, func() error {
 		return AssertRunningCommand(t, sessionID, "1", []string{"./sh"})
+	})
+}
+
+func TestExecute_WithEnv(t *testing.T) {
+	c := &Config{
+		Env: map[string]string{
+			"v1": "foo",
+			"v2": "bar",
+			"v3": "baz",
+			"v4": "foobar",
+			"v5": "aaa",
+		},
+		Windows: []Window{
+			{Panes: []Pane{
+				{Command: "test $v1 = foo && watch ls"},
+				{Command: "test $v2 = bar && cat"},
+			}},
+			{Panes: []Pane{
+				{Command: "test $v3 = baz && yes"},
+				{Command: "test $v4 = foobar && watch ls"},
+				{Command: "test $v5 = aaa && cat"},
+			}},
+		},
+		Attach: boolPtr(false),
+	}
+
+	sessionID, err := Execute(t, c)
+	if err != nil {
+		t.Error(err)
+	}
+	defer CleanSession(sessionID)
+
+	AssertWindowCount(t, sessionID, 2)
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat"})
+	})
+	RetryTest(t, 1*time.Second, 10, func() error {
+		return AssertRunningCommand(t, sessionID, "2", []string{"yes", "cat", "watch"})
 	})
 }
 

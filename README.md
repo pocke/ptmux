@@ -10,7 +10,7 @@ Requirements
 
 * Go 1.11 or later
 * `set -g base-index 1` in your `.tmux.conf`
-* tmux 2.0 or newer
+* tmux 2.5 or newer
 
 Installation
 -----------
@@ -33,6 +33,8 @@ Edit `~/.config/ptmux/PROFILE_NAME.yaml`
 ```yaml
 # Example
 root: ~/path/to/your/project/dir
+env:
+  DATABASE_URL: 'mysql2://username:topsecret@localhost/dbname'
 windows:
   - panes:
     - command: 'bin/rails s'
