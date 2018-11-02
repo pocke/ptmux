@@ -10,7 +10,7 @@ Requirements
 
 * Go 1.11 or later
 * `set -g base-index 1` in your `.tmux.conf`
-* tmux 2.0 or newer
+* tmux 2.5 or newer
 
 Installation
 -----------
