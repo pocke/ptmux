@@ -14,6 +14,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+func TestMain(m *testing.M) {
+	sessionID, err := exec.Command("tmux", "new-session", "-dP").Output()
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		exec.Command("tmux", "kill-session", string(sessionID[:len(sessionID)-1])).Run()
+	}()
+
+	err = exec.Command("tmux", "set", "-g", "base-index", "1").Run()
+	if err != nil {
+		panic(err)
+	}
+	err = exec.Command("tmux", "set-option", "-g", "renumber-windows", "on").Run()
+	if err != nil {
+		panic(err)
+	}
+
+	ret := m.Run()
+	os.Exit(ret)
+}
+
 func TestExecute_WithSingleWindow(t *testing.T) {
 	c := &Config{
 		Windows: []Window{
