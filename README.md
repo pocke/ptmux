@@ -57,6 +57,25 @@ Links
 
 - [tmuxinator の代替ツールを作っている話 - pockestrap](http://pocke.hatenablog.com/entry/2016/11/13/233258)
 
+Testing
+---
+
+NOTE: The testing changes tmux options to test. it will set `base-index` to `1` and `renumber-windows` to `on`. It probably changes your tmux options.
+If you do not want side effect, run tests in a docker container.
+
+Run tests:
+
+```
+$ make test
+```
+
+Run tests in a docker container:
+
+```
+$ make docker_build
+$ make test_with_docker
+```
+
 
 License
 -------
