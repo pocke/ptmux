@@ -195,7 +195,7 @@ func TestExecute_WithEnv(t *testing.T) {
 			{Panes: []Pane{
 				{Command: "test $v3 = baz && yes"},
 				{Command: "test $v4 = foobar && watch ls"},
-				{Command: "test $v5 = aaa && ping localhost"},
+				{Command: "test $v5 = aaa && cat"},
 			}},
 		},
 		Attach: boolPtr(false),
@@ -212,7 +212,7 @@ func TestExecute_WithEnv(t *testing.T) {
 		return AssertRunningCommand(t, sessionID, "1", []string{"watch", "cat"})
 	})
 	RetryTest(t, 1*time.Second, 10, func() error {
-		return AssertRunningCommand(t, sessionID, "2", []string{"yes", "ping", "watch"})
+		return AssertRunningCommand(t, sessionID, "2", []string{"yes", "cat", "watch"})
 	})
 }
 
