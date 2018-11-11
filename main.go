@@ -128,8 +128,12 @@ func (c *Config) Merge(right *Config) *Config {
 	wins = append(wins, right.Windows...)
 	merged.Windows = wins
 
-	for k, v := range right.Env {
-		merged.Env[k] = v
+	if merged.Env == nil {
+		merged.Env = right.Env
+	} else {
+		for k, v := range right.Env {
+			merged.Env[k] = v
+		}
 	}
 
 	return merged
